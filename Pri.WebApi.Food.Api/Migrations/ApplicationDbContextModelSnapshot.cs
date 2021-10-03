@@ -43,29 +43,29 @@ namespace Pri.WebApi.Food.Api.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2145),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2332),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(90),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(284),
                             Name = "Pizza"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000002"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2489),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2490),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(453),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(454),
                             Name = "Pasta"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000003"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2493),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2493),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(456),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(457),
                             Name = "Groenten"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000004"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2496),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 213, DateTimeKind.Utc).AddTicks(2496),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(460),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(461),
                             Name = "Fruit"
                         });
                 });
@@ -100,64 +100,64 @@ namespace Pri.WebApi.Food.Api.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000001"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(176),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(179),
-                            Name = "Pepperoni"
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8538),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8541),
+                            Name = "Peperoni"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000002"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000001"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(186),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(187),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8547),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8548),
                             Name = "Hawai"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000003"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000002"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(190),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(191),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8551),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8552),
                             Name = "Macaroni"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000004"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000002"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(194),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(195),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8555),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8556),
                             Name = "Spaghetti"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000005"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000003"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(198),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(199),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8559),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8560),
                             Name = "Komkommer"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000006"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000003"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(202),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(203),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8602),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8603),
                             Name = "Tomaat"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000007"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(206),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(207),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8607),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8608),
                             Name = "Appel"
                         },
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000008"),
                             CategoryId = new Guid("00000000-0000-0000-0000-000000000004"),
-                            CreatedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(210),
-                            LastEditedOn = new DateTime(2021, 10, 3, 12, 51, 0, 214, DateTimeKind.Utc).AddTicks(211),
+                            CreatedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8612),
+                            LastEditedOn = new DateTime(2021, 10, 3, 17, 17, 9, 266, DateTimeKind.Utc).AddTicks(8613),
                             Name = "Peer"
                         });
                 });

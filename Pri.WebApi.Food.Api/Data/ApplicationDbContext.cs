@@ -58,7 +58,7 @@ namespace Pri.WebApi.Food.Api.Data
                     new Product
                     {
                         Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                        Name = "Pepperoni",
+                        Name = "Peperoni",
                         CategoryId = Guid.Parse("00000000-0000-0000-0000-000000000001"), // Pizza
                         CreatedOn = DateTime.UtcNow,
                         LastEditedOn = DateTime.UtcNow
