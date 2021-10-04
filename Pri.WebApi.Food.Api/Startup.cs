@@ -1,20 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Pri.WebApi.Food.Api.Data;
 using Pri.WebApi.Food.Api.Repositories;
 using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Pri.WebApi.Food.Api
 {
@@ -38,6 +31,8 @@ namespace Pri.WebApi.Food.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Pri.WebApi.Food.Api", Version = "v1" });
             });
 
+            services.AddCors();
+
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
         }
@@ -53,6 +48,11 @@ namespace Pri.WebApi.Food.Api
             }
 
             app.UseHttpsRedirection();
+
+
+            app.UseCors(builder => builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
 
             app.UseRouting();
 
