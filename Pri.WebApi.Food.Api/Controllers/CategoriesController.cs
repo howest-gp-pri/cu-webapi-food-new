@@ -10,20 +10,21 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        protected readonly ICategoryService _categoryRepository;
-        protected readonly IProductService _ProductService;
+        protected readonly ICategoryService _categoryService;
+        protected readonly IProductService _productService;
 
-        public CategoriesController(ICategoryService categoryRepository, 
-            IProductService ProductService)
+        public CategoriesController(
+            ICategoryService categoryService, 
+            IProductService productService)
         {
-            _categoryRepository = categoryRepository;
-            _ProductService = ProductService;
+            _categoryService = categoryService;
+            _productService = productService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var categories = await _categoryRepository.ListAllAsync();
+            var categories = await _categoryService.ListAllAsync();
             var categoriesDto = categories.Select(c => new CategoryResponseDto
             {
                 Id = c.Id,
@@ -36,7 +37,7 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var category = await _categoryRepository.GetByIdAsync(id);
+            var category = await _categoryService.GetByIdAsync(id);
             if (category == null)
             {
                 return NotFound($"No category with an id of {id}");
@@ -53,7 +54,7 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetProductsFromCategory(Guid id)
         {
-            var products = await _ProductService.GetByCategoryIdAsync(id);
+            var products = await _productService.GetByCategoryIdAsync(id);
 
             var productsDto = products.Select(p => new ProductResponseDto
             {
@@ -72,17 +73,12 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(CategoryRequestDto categoryDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.Values);
-            }
-
             var categoryEntity = new Category
             {
                 Name = categoryDto.Name
             };
 
-            await _categoryRepository.AddAsync(categoryEntity);
+            await _categoryService.AddAsync(categoryEntity);
 
             return Ok();
         }
@@ -90,12 +86,7 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(CategoryRequestDto categoryDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.Values);
-            }
-
-            var categoryEntity = await _categoryRepository.GetByIdAsync(categoryDto.Id);
+            var categoryEntity = await _categoryService.GetByIdAsync(categoryDto.Id);
 
             if (categoryEntity == null)
             {
@@ -104,22 +95,21 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             categoryEntity.Name = categoryDto.Name;
 
-
-            await _categoryRepository.UpdateAsync(categoryEntity);
+            await _categoryService.UpdateAsync(categoryEntity);
 
             return Ok();
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var categoryEntity = await _categoryRepository.GetByIdAsync(id);
+            var categoryEntity = await _categoryService.GetByIdAsync(id);
 
             if (categoryEntity == null)
             {
                 return NotFound($"No category with an id of {id}");
             }
 
-            await _categoryRepository.DeleteAsync(categoryEntity);
+            await _categoryService.DeleteAsync(categoryEntity);
 
             return Ok();
         }
