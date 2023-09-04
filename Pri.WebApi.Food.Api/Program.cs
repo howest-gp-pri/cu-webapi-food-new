@@ -1,7 +1,7 @@
-using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using Pri.WebApi.Food.Api.Repositories;
 using Pri.WebApi.Food.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using Pri.WebApi.Food.Api.Services.Interfaces;
+using Pri.WebApi.Food.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +11,8 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDatabase"
 
 builder.Services.AddCors();
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 
 builder.Services.AddControllers();

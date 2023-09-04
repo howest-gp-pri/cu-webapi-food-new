@@ -1,19 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pri.WebApi.Food.Api.Data;
 using Pri.WebApi.Food.Api.Entities;
-using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Pri.WebApi.Food.Api.Services.Interfaces;
 
-namespace Pri.WebApi.Food.Api.Repositories
+namespace Pri.WebApi.Food.Api.Services
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
+    public class BaseService<T> : IBaseService<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _dbContext;
 
-        public BaseRepository(ApplicationDbContext dbContext)
+        public BaseService(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }

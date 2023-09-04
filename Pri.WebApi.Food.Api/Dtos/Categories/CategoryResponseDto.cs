@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pri.WebApi.Food.Api.Dtos.Categories
+﻿namespace Pri.WebApi.Food.Api.Dtos.Categories
 {
     public class CategoryResponseDto : BaseDto
     {

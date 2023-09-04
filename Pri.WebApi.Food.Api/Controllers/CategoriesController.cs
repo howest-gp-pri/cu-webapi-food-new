@@ -2,10 +2,7 @@
 using Pri.WebApi.Food.Api.Dtos.Categories;
 using Pri.WebApi.Food.Api.Dtos.Products;
 using Pri.WebApi.Food.Api.Entities;
-using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using Pri.WebApi.Food.Api.Services.Interfaces;
 
 namespace Pri.WebApi.Food.Api.Controllers
 {
@@ -13,14 +10,14 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        protected readonly ICategoryRepository _categoryRepository;
-        protected readonly IProductRepository _productRepository;
+        protected readonly ICategoryService _categoryRepository;
+        protected readonly IProductService _ProductService;
 
-        public CategoriesController(ICategoryRepository categoryRepository, 
-            IProductRepository productRepository)
+        public CategoriesController(ICategoryService categoryRepository, 
+            IProductService ProductService)
         {
             _categoryRepository = categoryRepository;
-            _productRepository = productRepository;
+            _ProductService = ProductService;
         }
 
         [HttpGet]
@@ -56,7 +53,7 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetProductsFromCategory(Guid id)
         {
-            var products = await _productRepository.GetByCategoryIdAsync(id);
+            var products = await _ProductService.GetByCategoryIdAsync(id);
 
             var productsDto = products.Select(p => new ProductResponseDto
             {

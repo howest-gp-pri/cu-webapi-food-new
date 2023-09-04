@@ -1,17 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pri.WebApi.Food.Api.Data;
 using Pri.WebApi.Food.Api.Entities;
-using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Pri.WebApi.Food.Api.Services.Interfaces;
 
-namespace Pri.WebApi.Food.Api.Repositories
+namespace Pri.WebApi.Food.Api.Services
 {
-    public class ProductRepository : BaseRepository<Product>, IProductRepository
+    public class ProductService : BaseService<Product>, IProductService
     {
-        public ProductRepository(ApplicationDbContext dbContext) : base(dbContext)
+        public ProductService(ApplicationDbContext dbContext) : base(dbContext)
         {
 
         }

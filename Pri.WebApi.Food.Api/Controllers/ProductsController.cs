@@ -2,12 +2,7 @@
 using Pri.WebApi.Food.Api.Dtos.Categories;
 using Pri.WebApi.Food.Api.Dtos.Products;
 using Pri.WebApi.Food.Api.Entities;
-using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Pri.WebApi.Food.Api.Services.Interfaces;
 
 namespace Pri.WebApi.Food.Api.Controllers
 {
@@ -15,20 +10,20 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        protected readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
+        protected readonly IProductService _ProductService;
+        private readonly ICategoryService _categoryRepository;
 
-        public ProductsController(IProductRepository productRepository,
-            ICategoryRepository categoryRepository)
+        public ProductsController(IProductService ProductService,
+            ICategoryService categoryRepository)
         {
-            _productRepository = productRepository;
+            _ProductService = ProductService;
             _categoryRepository = categoryRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var products = await _productRepository.ListAllAsync();
+            var products = await _ProductService.ListAllAsync();
             var productsDto = products.Select(p => new ProductResponseDto
             {
                 Id = p.Id,
@@ -46,7 +41,7 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            var product = await _ProductService.GetByIdAsync(id);
             if (product == null)
             {
                 return NotFound($"No product with an id of {id}");
@@ -87,7 +82,7 @@ namespace Pri.WebApi.Food.Api.Controllers
                 Name = productDto.Name
             };
 
-            await _productRepository.AddAsync(productEntity);
+            await _ProductService.AddAsync(productEntity);
 
             return Ok();
         }
@@ -108,7 +103,7 @@ namespace Pri.WebApi.Food.Api.Controllers
                 return BadRequest($"Cannot update product because category with id {productDto.CategoryId} does not exists");
             }
 
-            var productEntity = await _productRepository.GetByIdAsync(productDto.Id);
+            var productEntity = await _ProductService.GetByIdAsync(productDto.Id);
 
             if (productEntity == null)
             {
@@ -119,7 +114,7 @@ namespace Pri.WebApi.Food.Api.Controllers
             productEntity.Name = productDto.Name;
 
 
-            await _productRepository.UpdateAsync(productEntity);
+            await _ProductService.UpdateAsync(productEntity);
 
             return Ok();
         }
@@ -127,14 +122,14 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var productEntity = await _productRepository.GetByIdAsync(id);
+            var productEntity = await _ProductService.GetByIdAsync(id);
 
             if (productEntity == null)
             {
                 return NotFound($"No product with an id of {id}");
             }
 
-            await _productRepository.DeleteAsync(productEntity);
+            await _ProductService.DeleteAsync(productEntity);
 
             return Ok();
         }
