@@ -10,20 +10,21 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        protected readonly IProductService _ProductService;
-        private readonly ICategoryService _categoryRepository;
+        protected readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
 
-        public ProductsController(IProductService ProductService,
-            ICategoryService categoryRepository)
+        public ProductsController(
+            IProductService productService,
+            ICategoryService categoryService)
         {
-            _ProductService = ProductService;
-            _categoryRepository = categoryRepository;
+            _productService = productService;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var products = await _ProductService.ListAllAsync();
+            var products = await _productService.ListAllAsync();
             var productsDto = products.Select(p => new ProductResponseDto
             {
                 Id = p.Id,
@@ -41,7 +42,7 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var product = await _ProductService.GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
             if (product == null)
             {
                 return NotFound($"No product with an id of {id}");
@@ -63,13 +64,8 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(ProductRequestDto productDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.Values);
-            }
-
             // Check if CategoryId exists in db
-            var category = await _categoryRepository.GetByIdAsync(productDto.CategoryId);
+            var category = await _categoryService.GetByIdAsync(productDto.CategoryId);
 
             if (category == null)
             {
@@ -82,7 +78,7 @@ namespace Pri.WebApi.Food.Api.Controllers
                 Name = productDto.Name
             };
 
-            await _ProductService.AddAsync(productEntity);
+            await _productService.AddAsync(productEntity);
 
             return Ok();
         }
@@ -90,20 +86,15 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(ProductRequestDto productDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.Values);
-            }
-
             // Check if CategoryId exists in db
-            var category = await _categoryRepository.GetByIdAsync(productDto.CategoryId);
+            var category = await _categoryService.GetByIdAsync(productDto.CategoryId);
 
             if (category == null)
             {
                 return BadRequest($"Cannot update product because category with id {productDto.CategoryId} does not exists");
             }
 
-            var productEntity = await _ProductService.GetByIdAsync(productDto.Id);
+            var productEntity = await _productService.GetByIdAsync(productDto.Id);
 
             if (productEntity == null)
             {
@@ -114,7 +105,7 @@ namespace Pri.WebApi.Food.Api.Controllers
             productEntity.Name = productDto.Name;
 
 
-            await _ProductService.UpdateAsync(productEntity);
+            await _productService.UpdateAsync(productEntity);
 
             return Ok();
         }
@@ -122,14 +113,14 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var productEntity = await _ProductService.GetByIdAsync(id);
+            var productEntity = await _productService.GetByIdAsync(id);
 
             if (productEntity == null)
             {
                 return NotFound($"No product with an id of {id}");
             }
 
-            await _ProductService.DeleteAsync(productEntity);
+            await _productService.DeleteAsync(productEntity);
 
             return Ok();
         }
