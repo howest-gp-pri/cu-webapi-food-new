@@ -9,20 +9,17 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class SearchController : ControllerBase
     {
-        private readonly IProductService _ProductService;
-        private readonly ICategoryService _categoryRepository;
+        private readonly IProductService _productService;
 
-        public SearchController(IProductService ProductService,
-            ICategoryService categoryRepository)
+        public SearchController(IProductService productService)
         {
-            _ProductService = ProductService;
-            _categoryRepository = categoryRepository;
+            _productService = productService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] string searchQuery)
         {
-            var searchResults = await _ProductService.SearchAsync(searchQuery);
+            var searchResults = await _productService.SearchAsync(searchQuery);
 
             var searchResultsDto = searchResults.Select(s => new ProductResponseDto
             {
