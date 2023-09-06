@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Pri.WebApi.Food.Api.Data;
+using Pri.WebApi.Food.Core.Data;
 
 namespace Pri.WebApi.Food.Api.Migrations
 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pri.WebApi.Food.Api.Dtos.Categories;
 using Pri.WebApi.Food.Api.Dtos.Products;
-using Pri.WebApi.Food.Api.Entities;
-using Pri.WebApi.Food.Api.Services.Interfaces;
+using Pri.WebApi.Food.Core.Entities;
+using Pri.WebApi.Food.Core.Services.Interfaces;
 
 namespace Pri.WebApi.Food.Api.Controllers
 {

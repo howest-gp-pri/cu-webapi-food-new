@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pri.WebApi.Food.Api.Data;
-using Pri.WebApi.Food.Api.Entities;
-using Pri.WebApi.Food.Api.Services.Interfaces;
+using Pri.WebApi.Food.Core.Data;
+using Pri.WebApi.Food.Core.Entities;
+using Pri.WebApi.Food.Core.Services.Interfaces;
 
-namespace Pri.WebApi.Food.Api.Services
+namespace Pri.WebApi.Food.Core.Services
 {
     public class BaseService<T> : IBaseService<T> where T : BaseEntity
     {

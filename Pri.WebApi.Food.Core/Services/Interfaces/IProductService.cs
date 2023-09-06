@@ -1,6 +1,6 @@
-﻿using Pri.WebApi.Food.Api.Entities;
+﻿using Pri.WebApi.Food.Core.Entities;
 
-namespace Pri.WebApi.Food.Api.Services.Interfaces
+namespace Pri.WebApi.Food.Core.Services.Interfaces
 {
     public interface IProductService : IBaseService<Product>
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Pri.WebApi.Food.Api.Entities
+namespace Pri.WebApi.Food.Core.Entities
 {
     public class BaseEntity
     {

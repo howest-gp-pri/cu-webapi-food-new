@@ -1,7 +1,7 @@
-using Pri.WebApi.Food.Api.Data;
 using Microsoft.EntityFrameworkCore;
-using Pri.WebApi.Food.Api.Services.Interfaces;
-using Pri.WebApi.Food.Api.Services;
+using Pri.WebApi.Food.Core.Services.Interfaces;
+using Pri.WebApi.Food.Core.Services;
+using Pri.WebApi.Food.Core.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
