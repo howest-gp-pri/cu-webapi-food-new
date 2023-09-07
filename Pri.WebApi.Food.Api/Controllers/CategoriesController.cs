@@ -11,14 +11,14 @@ namespace Pri.WebApi.Food.Api.Controllers
     public class CategoriesController : ControllerBase
     {
         protected readonly ICategoryService _categoryService;
-        protected readonly IProductService _productService;
+        //protected readonly IProductService _productService;
 
         public CategoriesController(
             ICategoryService categoryService, 
             IProductService productService)
         {
             _categoryService = categoryService;
-            _productService = productService;
+            //_productService = productService;
         }
 
         [HttpGet]
@@ -51,24 +51,24 @@ namespace Pri.WebApi.Food.Api.Controllers
             return Ok(categoryDto);
         }
 
-        [HttpGet("{id}/products")]
-        public async Task<IActionResult> GetProductsFromCategory(Guid id)
-        {
-            var products = await _productService.GetByCategoryIdAsync(id);
+        //[HttpGet("{id}/products")]
+        //public async Task<IActionResult> GetProductsFromCategory(Guid id)
+        //{
+        //    var products = await _productService.GetByCategoryIdAsync(id);
 
-            var productsDto = products.Select(p => new ProductResponseDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Category = new CategoryResponseDto
-                {
-                    Id = p.Category.Id,
-                    Name = p.Category.Name
-                }
-            });
+        //    var productsDto = products.Select(p => new ProductResponseDto
+        //    {
+        //        Id = p.Id,
+        //        Name = p.Name,
+        //        Category = new CategoryResponseDto
+        //        {
+        //            Id = p.Category.Id,
+        //            Name = p.Category.Name
+        //        }
+        //    });
 
-            return Ok(productsDto);
-        }
+        //    return Ok(productsDto);
+        //}
 
         [HttpPost]
         public async Task<IActionResult> Add(CategoryRequestDto categoryDto)

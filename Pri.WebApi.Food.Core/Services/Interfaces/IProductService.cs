@@ -2,7 +2,7 @@
 
 namespace Pri.WebApi.Food.Core.Services.Interfaces
 {
-    public interface IProductService : IBaseService<Product>
+    public interface IProductService
     {
         Task<IEnumerable<Product>> GetByCategoryIdAsync(Guid id);
         Task<IEnumerable<Product>> SearchAsync(string search);

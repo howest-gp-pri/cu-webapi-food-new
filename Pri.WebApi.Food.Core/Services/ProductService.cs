@@ -5,25 +5,27 @@ using Pri.WebApi.Food.Core.Services.Interfaces;
 
 namespace Pri.WebApi.Food.Core.Services
 {
-    public class ProductService : BaseService<Product>, IProductService
+    public class ProductService : IProductService
     {
-        public ProductService(ApplicationDbContext dbContext) : base(dbContext)
-        {
+        private readonly ApplicationDbContext dbContext;
 
+        public ProductService(ApplicationDbContext dbContext)
+        {
+            this.dbContext = dbContext;
         }
 
-        public override IQueryable<Product> GetAll()
+        public IQueryable<Product> GetAll()
         {
-            return _dbContext.Products.Include(p => p.Category);
+            return dbContext.Products.Include(p => p.Category);
         }
 
-        public async override Task<IEnumerable<Product>> ListAllAsync()
+        public async Task<IEnumerable<Product>> ListAllAsync()
         {
             var products = await GetAll().ToListAsync();
             return products;
         }
 
-        public async override Task<Product> GetByIdAsync(Guid id)
+        public async Task<Product> GetByIdAsync(Guid id)
         {
             var product = await GetAll().SingleOrDefaultAsync(p => p.Id.Equals(id));
             return product;
@@ -42,6 +44,21 @@ namespace Pri.WebApi.Food.Core.Services
                 .ToListAsync();
 
             return products;
+        }
+
+        public Task<Product> UpdateAsync(Product entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Product> AddAsync(Product entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Product> DeleteAsync(Product entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }
