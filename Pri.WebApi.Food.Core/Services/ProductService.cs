@@ -46,19 +46,34 @@ namespace Pri.WebApi.Food.Core.Services
             return products;
         }
 
-        public Task<Product> UpdateAsync(Product entity)
+        public async Task<Product> UpdateAsync(Product entity)
         {
-            throw new NotImplementedException();
+            entity.LastEditedOn = DateTime.UtcNow;
+
+            dbContext.Products.Update(entity);
+            await dbContext.SaveChangesAsync();
+
+            return entity;
         }
 
-        public Task<Product> AddAsync(Product entity)
+        public async Task<Product> AddAsync(Product entity)
         {
-            throw new NotImplementedException();
+            var now = DateTime.UtcNow;
+            entity.CreatedOn = now;
+            entity.LastEditedOn = now;
+
+            dbContext.Products.Add(entity);
+            await dbContext.SaveChangesAsync();
+
+            return entity;
         }
 
-        public Task<Product> DeleteAsync(Product entity)
+        public async Task<Product> DeleteAsync(Product entity)
         {
-            throw new NotImplementedException();
+            dbContext.Products.Remove(entity);
+            await dbContext.SaveChangesAsync();
+
+            return entity;
         }
     }
 }
