@@ -24,14 +24,23 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var categories = await _categoryService.ListAllAsync();
-            var categoriesDto = categories.Select(c => new CategoryResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name
-            });
+            var request = await _categoryService.ListAllAsync();
 
-            return Ok(categoriesDto);
+            if (request.Success)
+            {
+                var categoriesDto = request.Data.Select(c => new CategoryResponseDto
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                });
+            }
+
+            else
+            {
+                return NoContent();
+            }
+
+
         }
 
         [HttpGet("{id}")]
