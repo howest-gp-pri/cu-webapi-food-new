@@ -3,6 +3,7 @@ using Pri.WebApi.Food.Core.Data;
 using Pri.WebApi.Food.Core.Entities;
 using Pri.WebApi.Food.Core.Services.Interfaces;
 using Pri.WebApi.Food.Core.Services.Models;
+using System.Data.Common;
 
 namespace Pri.WebApi.Food.Core.Services
 {
@@ -18,69 +19,51 @@ namespace Pri.WebApi.Food.Core.Services
         {
             return dbContext.Categories.AsQueryable();
         }
-        public async Task<Result<IEnumerable<Category>>> ListAllAsync()
+        public async Task<IEnumerable<Category>> ListAllAsync()
         {
-            var result = await dbContext.Categories.ToListAsync();
-            return new Result<IEnumerable<Category>> { Data = result };
-        }
-
-        public async Task<Result<Category>> GetByIdAsync(Guid id)
-        {
-            var result = await dbContext.Categories
-                .FirstOrDefaultAsync(category => category.Id.Equals(id));
-
-            if(result is not null) return new Result<Category> { Data = result };
-
-            return new Result<Category>
+            try
             {
-                Success = false,
-                Errors = new List<string> { $"The category with id {id} does not exists." }
-            };
-        }
-        public async Task<Result> UpdateAsync(Category entity)
-        {
-            Result result = new Result();
-
-            bool categoryNameExists = await dbContext.Categories
-                .AnyAsync(category => category.Name.ToUpper() == entity.Name);
-
-            if (categoryNameExists) 
-                result.Errors.Add("A category with this name already exists.");
-
-            var entityToUpdate = await dbContext.Categories
-                .FirstOrDefaultAsync(category => category.Id.Equals(entity.Id));
-
-            if (entityToUpdate is null)
-                result.Errors.Add($"The specified category (id: {entity.Id}) you want to update does not exist.");
-
-            if (result.Success)
-            {
-                entity.LastEditedOn = DateTime.UtcNow;
-                dbContext.Categories.Update(entity);
-                await dbContext.SaveChangesAsync();
-            }
-
-            return result;
-
-        }
-
-        public async Task<Result<Category>> AddAsync(Category entity)
-        {
-            Result<Category> result = new Result<Category>();
-
-            bool categoryNameExists = await dbContext.Categories
-                .AnyAsync(category => category.Name.ToUpper() == entity.Name);
-
-            if (categoryNameExists)
-                result.Errors.Add("A category with this name already exists.");
-
-            if (result.Errors.Any())
-            {
-                result.Success = false;
+                var result = await dbContext.Categories.ToListAsync();
                 return result;
             }
+            catch (DbException dbException)
+            {
+                throw dbException;
+            }
+        }
 
-            else
+        public async Task<Category> GetByIdAsync(Guid id)
+        {
+            try
+            {
+                var result = await dbContext.Categories
+                    .FirstOrDefaultAsync(category => category.Id.Equals(id));
+
+                return result;
+            }
+            catch (DbException dbException)
+            {
+                throw dbException;
+            }
+        }
+        public async Task<Category> UpdateAsync(Category entity)
+        {
+            try
+            {
+                dbContext.Categories.Update(entity);
+                await dbContext.SaveChangesAsync();
+
+                return entity;
+            }
+            catch (DbException dbException)
+            {
+                throw dbException;
+            }
+        }
+
+        public async Task<Category> AddAsync(Category entity)
+        {
+            try
             {
                 DateTime now = DateTime.UtcNow;
                 entity.CreatedOn = now;
@@ -89,31 +72,75 @@ namespace Pri.WebApi.Food.Core.Services
                 dbContext.Categories.Add(entity);
                 await dbContext.SaveChangesAsync();
 
-                return new Result<Category> { Data = entity };
+                return entity;
+            }
+            catch (DbException dbException)
+            {
+                throw dbException;
             }
         }
 
-        public async Task<Result> DeleteAsync(Category entity)
+        public async Task<Category> DeleteAsync(Category entity)
         {
-            Result result = new Result();
-
-            bool categoryHasProducts = dbContext.Products
-                .Any(product => product.CategoryId.Equals(entity.Id));
-
-            if (categoryHasProducts)
-            {
-                result.Success = false;
-                result.Errors.Add("Unable to delete category. This still has products linked.");
-
-                return result;
-            }
-            
-            else
+            try
             {
                 dbContext.Categories.Remove(entity);
                 await dbContext.SaveChangesAsync();
 
-                return new Result();
+                return entity;
+            }
+            catch (DbException dbException)
+            {
+                throw dbException;
+            }
+        }
+
+        public async Task<Result> CheckIfCategoryIsUnique(Category entity)
+        {
+            try
+            {
+                bool categoryNameExists = await dbContext.Categories
+                    .Where(category => category.Id != entity.Id)
+                    .AnyAsync(category => category.Name == entity.Name);
+
+                return !categoryNameExists ? new Result() : new Result
+                {
+                    Errors = new List<string>() { "A category with this name already exists" }
+                };
+            }
+            catch (DbException dbException)
+            {
+                throw dbException;
+            }
+        }
+
+        public async Task<Result> CheckIfCategoryCanBeDeleted(Category category)
+        {
+            Result result = new Result();
+
+            bool categoryHasProducts = await dbContext.Products
+                .AnyAsync(product => product.CategoryId.Equals(category.Id));
+
+            if (categoryHasProducts)
+            {
+                result.Errors.Add("Unable to delete category. This still has products linked.");
+            }
+
+            return result;
+        }
+
+        public async Task<Category> GetByName(string name)
+        {
+            try
+            {
+                var entity = await dbContext.Categories
+                    .FirstOrDefaultAsync(entity => entity.Name.ToUpper() == name.ToUpper());
+
+                return entity;
+            }
+            catch (DbException dbException)
+            {
+                throw dbException;
             }
         }
     }

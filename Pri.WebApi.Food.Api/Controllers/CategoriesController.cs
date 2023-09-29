@@ -24,33 +24,27 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var request = await _categoryService.ListAllAsync();
+            var categories = await _categoryService.ListAllAsync();
 
-            if (request.Success)
+            var categoryDtos = categories.Select(c => new CategoryResponseDto
             {
-                var categoriesDto = request.Data.Select(c => new CategoryResponseDto
-                {
-                    Id = c.Id,
-                    Name = c.Name
-                });
-            }
+                Id = c.Id,
+                Name = c.Name
+            });
 
-            else
-            {
-                return NoContent();
-            }
-
-
+            return Ok(categoryDtos);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var category = await _categoryService.GetByIdAsync(id);
+
             if (category == null)
             {
-                return NotFound($"No category with an id of {id}");
+                return NotFound($"No category found with {id}");
             }
+
             var categoryDto = new CategoryResponseDto
             {
                 Id = category.Id,
@@ -58,6 +52,89 @@ namespace Pri.WebApi.Food.Api.Controllers
             };
 
             return Ok(categoryDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add(CategoryRequestDto categoryDto)
+        {
+            var existsCategory = await _categoryService.GetByName(categoryDto.Name);
+
+            if (existsCategory is not null)
+            {
+                return BadRequest($"A product with the name '{categoryDto.Name}' already exists.");
+            }
+
+            Category category = new Category
+            {
+                Name = categoryDto.Name
+            };
+
+            var addedCategory = await _categoryService.AddAsync(category);
+
+            var dto = new CategoryResponseDto
+            {
+                Id = addedCategory.Id,
+                Name = addedCategory.Name
+            };
+            return Ok(dto);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(CategoryRequestDto categoryDto)
+        {
+            var existingCategory = await _categoryService.GetByIdAsync(categoryDto.Id);
+
+            if (existingCategory == null)
+            {
+                return NotFound($"No category with id '{categoryDto.Id}' found");
+            }
+
+            var updateCategory = new Category
+            {
+                Name = categoryDto.Name
+            };
+
+            var checkUniqueName = await _categoryService.CheckIfCategoryIsUnique(updateCategory);
+
+            if (!checkUniqueName.Success) 
+            {
+                foreach(var error in checkUniqueName.Errors)
+                {
+                    ModelState.AddModelError(nameof(categoryDto.Name), error);
+                }
+                return BadRequest(ModelState);
+            }
+
+            else
+            {
+                return Ok(await _categoryService.UpdateAsync(updateCategory));
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var existingCategory = await _categoryService.GetByIdAsync(id);
+
+            if (existingCategory == null)
+            {
+                return NotFound($"No category with an id of {id}");
+            }
+
+            var canDeleteResult = await _categoryService.CheckIfCategoryCanBeDeleted(existingCategory);
+
+            if (canDeleteResult.Errors.Any())
+            {
+                foreach (var error in canDeleteResult.Errors)
+                {
+                    ModelState.AddModelError(nameof(id), error);
+                }
+                return BadRequest(ModelState);
+            }
+
+            await _categoryService.DeleteAsync(existingCategory);
+
+            return Ok();
         }
 
         [HttpGet("{id}/products")]
@@ -77,50 +154,6 @@ namespace Pri.WebApi.Food.Api.Controllers
             });
 
             return Ok(productsDto);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Add(CategoryRequestDto categoryDto)
-        {
-            var categoryEntity = new Category
-            {
-                Name = categoryDto.Name
-            };
-
-            await _categoryService.AddAsync(categoryEntity);
-
-            return Ok();
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Update(CategoryRequestDto categoryDto)
-        {
-            var categoryEntity = await _categoryService.GetByIdAsync(categoryDto.Id);
-
-            if (categoryEntity == null)
-            {
-                return NotFound($"No category with an id of {categoryDto.Id}");
-            }
-
-            categoryEntity.Name = categoryDto.Name;
-
-            await _categoryService.UpdateAsync(categoryEntity);
-
-            return Ok();
-        }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            var categoryEntity = await _categoryService.GetByIdAsync(id);
-
-            if (categoryEntity == null)
-            {
-                return NotFound($"No category with an id of {id}");
-            }
-
-            await _categoryService.DeleteAsync(categoryEntity);
-
-            return Ok();
         }
     }
 }
