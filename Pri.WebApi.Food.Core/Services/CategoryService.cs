@@ -129,7 +129,7 @@ namespace Pri.WebApi.Food.Core.Services
             try
             {
                 var entity = await dbContext.Categories
-                    .FirstOrDefaultAsync(entity => entity.Name.ToUpper() == name.ToUpper());
+                    .FirstOrDefaultAsync(entity => entity.Name == name);
 
                 return entity;
             }
