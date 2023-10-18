@@ -76,7 +76,7 @@ namespace Pri.WebApi.Food.Api.Controllers
                 Id = category.Id,
                 Name = category.Name
             };
-            return Ok(dto);
+            return CreatedAtAction(nameof(Get), new { id = category.Id }, dto);
         }
 
         [HttpPut]
