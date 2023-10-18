@@ -108,6 +108,13 @@ namespace Pri.WebApi.Food.Api.Controllers
             else
             {
                 await _categoryService.UpdateAsync(updateCategory);
+
+                var dto = new CategoryResponseDto
+                {
+                    Id = updateCategory.Id,
+                    Name = updateCategory.Name
+                };
+
                 return Ok(updateCategory);
             }
         }
