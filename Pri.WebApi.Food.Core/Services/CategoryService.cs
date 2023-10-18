@@ -46,14 +46,12 @@ namespace Pri.WebApi.Food.Core.Services
                 throw dbException;
             }
         }
-        public async Task<Category> UpdateAsync(Category entity)
+        public async Task UpdateAsync(Category entity)
         {
             try
             {
                 dbContext.Categories.Update(entity);
                 await dbContext.SaveChangesAsync();
-
-                return entity;
             }
             catch (DbException dbException)
             {
@@ -61,7 +59,7 @@ namespace Pri.WebApi.Food.Core.Services
             }
         }
 
-        public async Task<Category> AddAsync(Category entity)
+        public async Task AddAsync(Category entity)
         {
             try
             {
@@ -72,7 +70,6 @@ namespace Pri.WebApi.Food.Core.Services
                 dbContext.Categories.Add(entity);
                 await dbContext.SaveChangesAsync();
 
-                return entity;
             }
             catch (DbException dbException)
             {
@@ -80,14 +77,12 @@ namespace Pri.WebApi.Food.Core.Services
             }
         }
 
-        public async Task<Category> DeleteAsync(Category entity)
+        public async Task DeleteAsync(Category entity)
         {
             try
             {
                 dbContext.Categories.Remove(entity);
                 await dbContext.SaveChangesAsync();
-
-                return entity;
             }
             catch (DbException dbException)
             {

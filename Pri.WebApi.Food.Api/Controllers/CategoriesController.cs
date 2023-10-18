@@ -69,12 +69,12 @@ namespace Pri.WebApi.Food.Api.Controllers
                 Name = categoryDto.Name
             };
 
-            var addedCategory = await _categoryService.AddAsync(category);
+            await _categoryService.AddAsync(category);
 
             var dto = new CategoryResponseDto
             {
-                Id = addedCategory.Id,
-                Name = addedCategory.Name
+                Id = category.Id,
+                Name = category.Name
             };
             return Ok(dto);
         }
@@ -107,7 +107,8 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             else
             {
-                return Ok(await _categoryService.UpdateAsync(updateCategory));
+                await _categoryService.UpdateAsync(updateCategory);
+                return Ok(updateCategory);
             }
         }
 
