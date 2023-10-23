@@ -12,7 +12,7 @@ namespace Pri.WebApi.Food.Core.Services.Interfaces
         Task UpdateAsync(Category entity);
         Task AddAsync(Category entity);
         Task DeleteAsync(Category entity);
-        Task<Result> CheckIfCategoryIsUnique(Category entity);
+        Task<Result> CheckIfUpdateCategoryIsUnique(Category entity);
         Task<Result> CheckIfCategoryCanBeDeleted(Category category);
     }
 }

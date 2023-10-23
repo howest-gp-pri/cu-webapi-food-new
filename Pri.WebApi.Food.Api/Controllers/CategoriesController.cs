@@ -89,12 +89,9 @@ namespace Pri.WebApi.Food.Api.Controllers
                 return NotFound($"No category with id '{categoryDto.Id}' found");
             }
 
-            var updateCategory = new Category
-            {
-                Name = categoryDto.Name
-            };
+            existingCategory.Name = categoryDto.Name;
 
-            var checkUniqueName = await _categoryService.CheckIfCategoryIsUnique(updateCategory);
+            var checkUniqueName = await _categoryService.CheckIfUpdateCategoryIsUnique(existingCategory);
 
             if (!checkUniqueName.Success) 
             {
@@ -107,15 +104,15 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             else
             {
-                await _categoryService.UpdateAsync(updateCategory);
+                await _categoryService.UpdateAsync(existingCategory);
 
                 var dto = new CategoryResponseDto
                 {
-                    Id = updateCategory.Id,
-                    Name = updateCategory.Name
+                    Id = existingCategory.Id,
+                    Name = existingCategory.Name
                 };
 
-                return Ok(updateCategory);
+                return Ok(dto);
             }
         }
 

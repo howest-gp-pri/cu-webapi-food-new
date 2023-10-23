@@ -50,6 +50,8 @@ namespace Pri.WebApi.Food.Core.Services
         {
             try
             {
+                entity.LastEditedOn = DateTime.UtcNow;
+
                 dbContext.Categories.Update(entity);
                 await dbContext.SaveChangesAsync();
             }
@@ -90,7 +92,7 @@ namespace Pri.WebApi.Food.Core.Services
             }
         }
 
-        public async Task<Result> CheckIfCategoryIsUnique(Category entity)
+        public async Task<Result> CheckIfUpdateCategoryIsUnique(Category entity)
         {
             try
             {
