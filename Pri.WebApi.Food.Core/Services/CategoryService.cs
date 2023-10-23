@@ -21,94 +21,52 @@ namespace Pri.WebApi.Food.Core.Services
         }
         public async Task<IEnumerable<Category>> ListAllAsync()
         {
-            try
-            {
-                var result = await dbContext.Categories.ToListAsync();
-                return result;
-            }
-            catch (DbException dbException)
-            {
-                throw dbException;
-            }
+            var result = await dbContext.Categories.ToListAsync();
+            return result;
         }
 
         public async Task<Category> GetByIdAsync(Guid id)
         {
-            try
-            {
-                var result = await dbContext.Categories
-                    .FirstOrDefaultAsync(category => category.Id.Equals(id));
+            var result = await dbContext.Categories
+                .FirstOrDefaultAsync(category => category.Id.Equals(id));
 
-                return result;
-            }
-            catch (DbException dbException)
-            {
-                throw dbException;
-            }
+            return result;
+
         }
         public async Task UpdateAsync(Category entity)
         {
-            try
-            {
-                entity.LastEditedOn = DateTime.UtcNow;
+            entity.LastEditedOn = DateTime.UtcNow;
 
-                dbContext.Categories.Update(entity);
-                await dbContext.SaveChangesAsync();
-            }
-            catch (DbException dbException)
-            {
-                throw dbException;
-            }
+            dbContext.Categories.Update(entity);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task AddAsync(Category entity)
         {
-            try
-            {
-                DateTime now = DateTime.UtcNow;
-                entity.CreatedOn = now;
-                entity.LastEditedOn = now;
+            DateTime now = DateTime.UtcNow;
+            entity.CreatedOn = now;
+            entity.LastEditedOn = now;
 
-                dbContext.Categories.Add(entity);
-                await dbContext.SaveChangesAsync();
-
-            }
-            catch (DbException dbException)
-            {
-                throw dbException;
-            }
+            dbContext.Categories.Add(entity);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Category entity)
         {
-            try
-            {
-                dbContext.Categories.Remove(entity);
-                await dbContext.SaveChangesAsync();
-            }
-            catch (DbException dbException)
-            {
-                throw dbException;
-            }
+            dbContext.Categories.Remove(entity);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task<Result> CheckIfUpdateCategoryIsUnique(Category entity)
         {
-            try
-            {
-                bool categoryNameExists = await dbContext.Categories
-                    .Where(category => category.Id != entity.Id)
-                    .AnyAsync(category => category.Name == entity.Name);
+            bool categoryNameExists = await dbContext.Categories
+                .Where(category => category.Id != entity.Id)
+                .AnyAsync(category => category.Name == entity.Name);
 
-                return !categoryNameExists ? new Result() : new Result
-                {
-                    Errors = new List<string>() { "A category with this name already exists" }
-                };
-            }
-            catch (DbException dbException)
+            return !categoryNameExists ? new Result() : new Result
             {
-                throw dbException;
-            }
+                Errors = new List<string>() { "A category with this name already exists" }
+            };
         }
 
         public async Task<Result> CheckIfCategoryCanBeDeleted(Category category)
@@ -128,17 +86,10 @@ namespace Pri.WebApi.Food.Core.Services
 
         public async Task<Category> GetByName(string name)
         {
-            try
-            {
-                var entity = await dbContext.Categories
-                    .FirstOrDefaultAsync(entity => entity.Name == name);
+            var entity = await dbContext.Categories
+                .FirstOrDefaultAsync(entity => entity.Name == name);
 
-                return entity;
-            }
-            catch (DbException dbException)
-            {
-                throw dbException;
-            }
+            return entity;
         }
     }
 }

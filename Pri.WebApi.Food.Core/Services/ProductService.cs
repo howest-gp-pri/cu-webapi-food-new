@@ -48,18 +48,10 @@ namespace Pri.WebApi.Food.Core.Services
 
         public async Task UpdateAsync(Product entity)
         {
-            try
-            {
-                entity.LastEditedOn = DateTime.UtcNow;
+            entity.LastEditedOn = DateTime.UtcNow;
 
-                dbContext.Products.Update(entity);
-                await dbContext.SaveChangesAsync();
-
-            }
-            catch(DbUpdateException dbException)
-            {
-                throw dbException;
-            }
+            dbContext.Products.Update(entity);
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task AddAsync(Product entity)
@@ -74,15 +66,8 @@ namespace Pri.WebApi.Food.Core.Services
 
         public async Task DeleteAsync(Product entity)
         {
-            try
-            {
-                dbContext.Products.Remove(entity);
-                await dbContext.SaveChangesAsync();
-            }
-            catch(DbUpdateException dbException)
-            {
-                throw dbException;
-            }
+            dbContext.Products.Remove(entity);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

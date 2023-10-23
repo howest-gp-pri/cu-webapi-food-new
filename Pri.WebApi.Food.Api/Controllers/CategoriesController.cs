@@ -69,13 +69,21 @@ namespace Pri.WebApi.Food.Api.Controllers
                 Name = categoryDto.Name
             };
 
-            await _categoryService.AddAsync(category);
+            try
+            {
+                await _categoryService.AddAsync(category);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
 
             var dto = new CategoryResponseDto
             {
                 Id = category.Id,
                 Name = category.Name
             };
+
             return CreatedAtAction(nameof(Get), new { id = category.Id }, dto);
         }
 
