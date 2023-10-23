@@ -86,7 +86,7 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             if (existingCategory == null)
             {
-                return NotFound($"No category with id '{categoryDto.Id}' found");
+                return BadRequest($"No category with id '{categoryDto.Id}' found");
             }
 
             existingCategory.Name = categoryDto.Name;
