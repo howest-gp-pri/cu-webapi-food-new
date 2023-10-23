@@ -46,17 +46,23 @@ namespace Pri.WebApi.Food.Core.Services
             return products;
         }
 
-        public async Task<Product> UpdateAsync(Product entity)
+        public async Task UpdateAsync(Product entity)
         {
-            entity.LastEditedOn = DateTime.UtcNow;
+            try
+            {
+                entity.LastEditedOn = DateTime.UtcNow;
 
-            dbContext.Products.Update(entity);
-            await dbContext.SaveChangesAsync();
+                dbContext.Products.Update(entity);
+                await dbContext.SaveChangesAsync();
 
-            return entity;
+            }
+            catch(DbUpdateException dbException)
+            {
+                throw dbException;
+            }
         }
 
-        public async Task<Product> AddAsync(Product entity)
+        public async Task AddAsync(Product entity)
         {
             var now = DateTime.UtcNow;
             entity.CreatedOn = now;
@@ -64,16 +70,19 @@ namespace Pri.WebApi.Food.Core.Services
 
             dbContext.Products.Add(entity);
             await dbContext.SaveChangesAsync();
-
-            return entity;
         }
 
-        public async Task<Product> DeleteAsync(Product entity)
+        public async Task DeleteAsync(Product entity)
         {
-            dbContext.Products.Remove(entity);
-            await dbContext.SaveChangesAsync();
-
-            return entity;
+            try
+            {
+                dbContext.Products.Remove(entity);
+                await dbContext.SaveChangesAsync();
+            }
+            catch(DbUpdateException dbException)
+            {
+                throw dbException;
+            }
         }
     }
 }

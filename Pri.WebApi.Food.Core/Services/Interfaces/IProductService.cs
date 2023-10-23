@@ -7,9 +7,9 @@ namespace Pri.WebApi.Food.Core.Services.Interfaces
         IQueryable<Product> GetAll();
         Task<IEnumerable<Product>> ListAllAsync();
         Task<Product> GetByIdAsync(Guid id);
-        Task<Product> UpdateAsync(Product entity);
-        Task<Product> AddAsync(Product entity);
-        Task<Product> DeleteAsync(Product entity);
+        Task UpdateAsync(Product entity);
+        Task AddAsync(Product entity);
+        Task DeleteAsync(Product entity);
 
         Task<IEnumerable<Product>> GetByCategoryIdAsync(Guid id);
         Task<IEnumerable<Product>> SearchAsync(string search);

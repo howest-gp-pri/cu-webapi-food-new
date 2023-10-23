@@ -43,10 +43,12 @@ namespace Pri.WebApi.Food.Api.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
             var product = await _productService.GetByIdAsync(id);
+
             if (product == null)
             {
                 return NotFound($"No product with an id of {id}");
             }
+
             var productDto = new ProductResponseDto
             {
                 Id = product.Id,
@@ -72,15 +74,27 @@ namespace Pri.WebApi.Food.Api.Controllers
                 return BadRequest($"Cannot add new product because category with id {productDto.CategoryId} does not exists");
             }
 
-            var productEntity = new Product
+            var product = new Product
             {
                 CategoryId = productDto.CategoryId,
                 Name = productDto.Name
             };
 
-            await _productService.AddAsync(productEntity);
+            //In our db, it is allowed to have products with the same name
+            await _productService.AddAsync(product);
 
-            return Ok();
+            var dto = new ProductResponseDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Category = new CategoryResponseDto
+                {
+                    Id = category.Id,
+                    Name = category.Name
+                }
+            };
+
+            return CreatedAtAction(nameof(Get), new { id = product.Id }, dto);
         }
 
         [HttpPut]
@@ -94,18 +108,18 @@ namespace Pri.WebApi.Food.Api.Controllers
                 return BadRequest($"Cannot update product because category with id {productDto.CategoryId} does not exists");
             }
 
-            var productEntity = await _productService.GetByIdAsync(productDto.Id);
+            var product = await _productService.GetByIdAsync(productDto.Id);
 
-            if (productEntity == null)
+            if (product == null)
             {
-                return NotFound($"No product with an id of {productDto.Id}");
+                return BadRequest($"No product with an id of {productDto.Id}");
             }
 
-            productEntity.CategoryId = productDto.CategoryId;
-            productEntity.Name = productDto.Name;
+            product.CategoryId = productDto.CategoryId;
+            product.Name = productDto.Name;
 
-
-            await _productService.UpdateAsync(productEntity);
+            //In our db, it is allowed to have products with the same name
+            await _productService.UpdateAsync(product);
 
             return Ok();
         }
@@ -113,14 +127,14 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var productEntity = await _productService.GetByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
 
-            if (productEntity == null)
+            if (product == null)
             {
                 return NotFound($"No product with an id of {id}");
             }
 
-            await _productService.DeleteAsync(productEntity);
+            await _productService.DeleteAsync(product);
 
             return Ok();
         }
