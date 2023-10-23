@@ -108,31 +108,20 @@ namespace Pri.WebApi.Food.Api.Controllers
                 return BadRequest($"Cannot update product because category with id {productDto.CategoryId} does not exists");
             }
 
-            var product = await _productService.GetByIdAsync(productDto.Id);
+            var existingProduct = await _productService.GetByIdAsync(productDto.Id);
 
-            if (product == null)
+            if (existingProduct == null)
             {
                 return BadRequest($"No product with an id of {productDto.Id}");
             }
 
-            product.CategoryId = productDto.CategoryId;
-            product.Name = productDto.Name;
+            existingProduct.CategoryId = productDto.CategoryId;
+            existingProduct.Name = productDto.Name;
 
             //In our db, it is allowed to have products with the same name
-            await _productService.UpdateAsync(product);
+            await _productService.UpdateAsync(existingProduct);
 
-            var dto = new ProductResponseDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Category = new CategoryResponseDto
-                {
-                    Id = category.Id,
-                    Name = category.Name
-                }
-            };
-
-            return Ok(dto);
+            return Ok($"Product {existingProduct.Id} updated");
         }
 
         [HttpDelete("{id}")]
@@ -147,7 +136,7 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             await _productService.DeleteAsync(product);
 
-            return Ok();
+            return Ok($"Product {product.Id} deleted");
         }
     }
 }

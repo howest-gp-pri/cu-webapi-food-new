@@ -69,14 +69,7 @@ namespace Pri.WebApi.Food.Api.Controllers
                 Name = categoryDto.Name
             };
 
-            try
-            {
-                await _categoryService.AddAsync(category);
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
+            await _categoryService.AddAsync(category);
 
             var dto = new CategoryResponseDto
             {
@@ -114,13 +107,7 @@ namespace Pri.WebApi.Food.Api.Controllers
             {
                 await _categoryService.UpdateAsync(existingCategory);
 
-                var dto = new CategoryResponseDto
-                {
-                    Id = existingCategory.Id,
-                    Name = existingCategory.Name
-                };
-
-                return Ok(dto);
+                return Ok($"Category {existingCategory.Id} updated");
             }
         }
 
@@ -147,7 +134,7 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             await _categoryService.DeleteAsync(existingCategory);
 
-            return Ok();
+            return Ok($"Category {existingCategory.Id} deleted");
         }
 
         [HttpGet("{id}/products")]
