@@ -121,7 +121,18 @@ namespace Pri.WebApi.Food.Api.Controllers
             //In our db, it is allowed to have products with the same name
             await _productService.UpdateAsync(product);
 
-            return Ok();
+            var dto = new ProductResponseDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Category = new CategoryResponseDto
+                {
+                    Id = category.Id,
+                    Name = category.Name
+                }
+            };
+
+            return Ok(dto);
         }
 
         [HttpDelete("{id}")]
