@@ -96,11 +96,7 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             if (!checkUniqueName.Success) 
             {
-                foreach(var error in checkUniqueName.Errors)
-                {
-                    ModelState.AddModelError(nameof(categoryDto.Name), error);
-                }
-                return BadRequest(ModelState);
+                return BadRequest(checkUniqueName.Errors);
             }
 
             else
@@ -123,13 +119,9 @@ namespace Pri.WebApi.Food.Api.Controllers
 
             var canDeleteResult = await _categoryService.CheckIfCategoryCanBeDeleted(existingCategory);
 
-            if (canDeleteResult.Errors.Any())
+            if (!canDeleteResult.Success)
             {
-                foreach (var error in canDeleteResult.Errors)
-                {
-                    ModelState.AddModelError(nameof(id), error);
-                }
-                return BadRequest(ModelState);
+                return BadRequest(canDeleteResult.Errors);
             }
 
             await _categoryService.DeleteAsync(existingCategory);
