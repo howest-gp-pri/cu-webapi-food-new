@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pri.WebApi.Food.Api.Dtos.Categories;
 using Pri.WebApi.Food.Api.Dtos.Products;
-using Pri.WebApi.Food.Api.Entities;
-using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using Pri.WebApi.Food.Core.Entities;
+using Pri.WebApi.Food.Core.Services.Interfaces;
 
 namespace Pri.WebApi.Food.Api.Controllers
 {
@@ -13,37 +10,41 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        protected readonly ICategoryRepository _categoryRepository;
-        protected readonly IProductRepository _productRepository;
+        protected readonly ICategoryService _categoryService;
+        protected readonly IProductService _productService;
 
-        public CategoriesController(ICategoryRepository categoryRepository, 
-            IProductRepository productRepository)
+        public CategoriesController(
+            ICategoryService categoryService, 
+            IProductService productService)
         {
-            _categoryRepository = categoryRepository;
-            _productRepository = productRepository;
+            _categoryService = categoryService;
+            _productService = productService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var categories = await _categoryRepository.ListAllAsync();
-            var categoriesDto = categories.Select(c => new CategoryResponseDto
+            var categories = await _categoryService.ListAllAsync();
+
+            var categoryDtos = categories.Select(c => new CategoryResponseDto
             {
                 Id = c.Id,
                 Name = c.Name
             });
 
-            return Ok(categoriesDto);
+            return Ok(categoryDtos);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var category = await _categoryRepository.GetByIdAsync(id);
+            var category = await _categoryService.GetByIdAsync(id);
+
             if (category == null)
             {
-                return NotFound($"No category with an id of {id}");
+                return NotFound($"No category found with {id}");
             }
+
             var categoryDto = new CategoryResponseDto
             {
                 Id = category.Id,
@@ -53,10 +54,85 @@ namespace Pri.WebApi.Food.Api.Controllers
             return Ok(categoryDto);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Add(CategoryRequestDto categoryDto)
+        {
+            var existsCategory = await _categoryService.GetByName(categoryDto.Name);
+
+            if (existsCategory is not null)
+            {
+                return BadRequest($"A product with the name '{categoryDto.Name}' already exists.");
+            }
+
+            Category category = new Category
+            {
+                Name = categoryDto.Name
+            };
+
+            await _categoryService.AddAsync(category);
+
+            var dto = new CategoryResponseDto
+            {
+                Id = category.Id,
+                Name = category.Name
+            };
+
+            return CreatedAtAction(nameof(Get), new { id = category.Id }, dto);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(CategoryRequestDto categoryDto)
+        {
+            var existingCategory = await _categoryService.GetByIdAsync(categoryDto.Id);
+
+            if (existingCategory == null)
+            {
+                return BadRequest($"No category with id '{categoryDto.Id}' found");
+            }
+
+            existingCategory.Name = categoryDto.Name;
+
+            var checkUniqueName = await _categoryService.CheckIfUpdateCategoryIsUnique(existingCategory);
+
+            if (!checkUniqueName.Success) 
+            {
+                return BadRequest(checkUniqueName.Errors);
+            }
+
+            else
+            {
+                await _categoryService.UpdateAsync(existingCategory);
+
+                return Ok($"Category {existingCategory.Id} updated");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var existingCategory = await _categoryService.GetByIdAsync(id);
+
+            if (existingCategory == null)
+            {
+                return NotFound($"No category with an id of {id}");
+            }
+
+            var canDeleteResult = await _categoryService.CheckIfCategoryCanBeDeleted(existingCategory);
+
+            if (!canDeleteResult.Success)
+            {
+                return BadRequest(canDeleteResult.Errors);
+            }
+
+            await _categoryService.DeleteAsync(existingCategory);
+
+            return Ok($"Category {existingCategory.Id} deleted");
+        }
+
         [HttpGet("{id}/products")]
         public async Task<IActionResult> GetProductsFromCategory(Guid id)
         {
-            var products = await _productRepository.GetByCategoryIdAsync(id);
+            var products = await _productService.GetByCategoryIdAsync(id);
 
             var productsDto = products.Select(p => new ProductResponseDto
             {
@@ -70,61 +146,6 @@ namespace Pri.WebApi.Food.Api.Controllers
             });
 
             return Ok(productsDto);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Add(CategoryRequestDto categoryDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.Values);
-            }
-
-            var categoryEntity = new Category
-            {
-                Name = categoryDto.Name
-            };
-
-            await _categoryRepository.AddAsync(categoryEntity);
-
-            return Ok();
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Update(CategoryRequestDto categoryDto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.Values);
-            }
-
-            var categoryEntity = await _categoryRepository.GetByIdAsync(categoryDto.Id);
-
-            if (categoryEntity == null)
-            {
-                return NotFound($"No category with an id of {categoryDto.Id}");
-            }
-
-            categoryEntity.Name = categoryDto.Name;
-
-
-            await _categoryRepository.UpdateAsync(categoryEntity);
-
-            return Ok();
-        }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            var categoryEntity = await _categoryRepository.GetByIdAsync(id);
-
-            if (categoryEntity == null)
-            {
-                return NotFound($"No category with an id of {id}");
-            }
-
-            await _categoryRepository.DeleteAsync(categoryEntity);
-
-            return Ok();
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pri.WebApi.Food.Api.Dtos.Categories;
 using Pri.WebApi.Food.Api.Dtos.Products;
-using Pri.WebApi.Food.Api.Repositories.Interfaces;
-using System.Linq;
-using System.Threading.Tasks;
+using Pri.WebApi.Food.Core.Services.Interfaces;
 
 namespace Pri.WebApi.Food.Api.Controllers
 {
@@ -11,20 +9,17 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class SearchController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IProductService _productService;
 
-        public SearchController(IProductRepository productRepository,
-            ICategoryRepository categoryRepository)
+        public SearchController(IProductService productService)
         {
-            _productRepository = productRepository;
-            _categoryRepository = categoryRepository;
+            _productService = productService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] string searchQuery)
         {
-            var searchResults = await _productRepository.SearchAsync(searchQuery);
+            var searchResults = await _productService.SearchAsync(searchQuery);
 
             var searchResultsDto = searchResults.Select(s => new ProductResponseDto
             {

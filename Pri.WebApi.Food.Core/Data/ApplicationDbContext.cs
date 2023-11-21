@@ -1,12 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pri.WebApi.Food.Api.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Pri.WebApi.Food.Core.Entities;
 
-namespace Pri.WebApi.Food.Api.Data
+namespace Pri.WebApi.Food.Core.Data
 {
     public class ApplicationDbContext : DbContext
     {
