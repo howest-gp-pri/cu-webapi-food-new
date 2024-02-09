@@ -9,87 +9,108 @@ namespace Pri.WebApi.Food.Core.Services
 {
     public class CategoryService : ICategoryService
     {
-        private readonly ApplicationDbContext dbContext;
-
-        public CategoryService(ApplicationDbContext dbContext)
+        private readonly ApplicationDbContext _applicationDbContext;
+        public CategoryService(ApplicationDbContext applicationDbContext)
         {
-            this.dbContext = dbContext;
+            _applicationDbContext = applicationDbContext;
         }
+
+        public async Task<ResultModel<Category>> AddAsync(Category entity)
+        {
+            //does categoryname exist?
+            if (await DoesCategoryNameExistsAsync(entity))
+            {
+                return new ResultModel<Category>
+                {
+                    Errors = new List<string>
+              { $"A category with the name {entity.Name} already exists!" },
+                };
+            }
+            entity.CreatedOn = DateTime.UtcNow;
+            entity.LastEditedOn = DateTime.UtcNow;
+            _applicationDbContext.Categories.Add(entity);
+            await _applicationDbContext.SaveChangesAsync();
+            return new ResultModel<Category> { Data = entity };
+        }
+
+        public async Task<ResultModel<Category>> DeleteAsync(Category entity)
+        {
+            _applicationDbContext.Categories.Remove(entity);
+            await _applicationDbContext.SaveChangesAsync();
+            return new ResultModel<Category> { Data = entity };
+        }
+
+        public async Task<bool> DoesCategoryIdExistsAsync(Guid id)
+        {
+            return await _applicationDbContext.Categories.AnyAsync(c => c.Id.Equals(id));
+        }
+        public async Task<bool> DoesCategoryNameExistsAsync(Category Entity)
+        {
+            return await _applicationDbContext.Categories
+                   .Where(c => c.Id != Entity.Id)
+                   .AnyAsync(c => c.Name.Equals(Entity.Name));
+        }
+
         public IQueryable<Category> GetAll()
         {
-            return dbContext.Categories.AsQueryable();
-        }
-        public async Task<IEnumerable<Category>> ListAllAsync()
-        {
-            var result = await dbContext.Categories.ToListAsync();
-            return result;
+            return _applicationDbContext.Categories;
         }
 
-        public async Task<Category> GetByIdAsync(Guid id)
+
+
+        public async Task<ResultModel<Category>> GetByIdAsync(Guid id)
         {
-            var result = await dbContext.Categories
-                .FirstOrDefaultAsync(category => category.Id.Equals(id));
-
-            return result;
-
-        }
-        public async Task UpdateAsync(Category entity)
-        {
-            entity.LastEditedOn = DateTime.UtcNow;
-
-            dbContext.Categories.Update(entity);
-            await dbContext.SaveChangesAsync();
-        }
-
-        public async Task AddAsync(Category entity)
-        {
-            DateTime now = DateTime.UtcNow;
-            entity.CreatedOn = now;
-            entity.LastEditedOn = now;
-
-            dbContext.Categories.Add(entity);
-            await dbContext.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(Category entity)
-        {
-            dbContext.Categories.Remove(entity);
-            await dbContext.SaveChangesAsync();
-        }
-
-        public async Task<Result> CheckIfUpdateCategoryIsUnique(Category entity)
-        {
-            bool categoryNameExists = await dbContext.Categories
-                .Where(category => category.Id != entity.Id)
-                .AnyAsync(category => category.Name == entity.Name);
-
-            return !categoryNameExists ? new Result() : new Result
+            var resultModel = new ResultModel<Category>();
+            var category = await _applicationDbContext.Categories
+               .FirstOrDefaultAsync(category => category.Id.Equals(id));
+            if (category is null)
             {
-                Errors = new List<string>() { "A category with this name already exists" }
-            };
-        }
-
-        public async Task<Result> CheckIfCategoryCanBeDeleted(Category category)
-        {
-            Result result = new Result();
-
-            bool categoryHasProducts = await dbContext.Products
-                .AnyAsync(product => product.CategoryId.Equals(category.Id));
-
-            if (categoryHasProducts)
-            {
-                result.Errors.Add("Unable to delete category. This still has products linked.");
+                resultModel = new ResultModel<Category>();
+                resultModel.Errors.Add($"Category does not exists");
+                return resultModel;
             }
-
-            return result;
+            resultModel = new ResultModel<Category> { Data = category };
+            return resultModel;
         }
 
-        public async Task<Category> GetByName(string name)
+        public async Task<ResultModel<IEnumerable<Category>>> GetByName(string name)
         {
-            var entity = await dbContext.Categories
-                .FirstOrDefaultAsync(entity => entity.Name == name);
+            var categories = await _applicationDbContext.Categories
+               .Where(c => c.Name.Contains(name)).ToListAsync();
+            return new ResultModel<IEnumerable<Category>> { Data = categories };
+        }
 
-            return entity;
+        public async Task<ResultModel<IEnumerable<Category>>> ListAllAsync()
+        {
+            var categories = await _applicationDbContext.Categories.ToListAsync();
+            return new ResultModel<IEnumerable<Category>> { Data = categories };
+        }
+
+        public async Task<ResultModel<Category>> UpdateAsync(Category entity)
+        {
+            //does category id exist?
+            if (!await DoesCategoryIdExistsAsync(entity.Id))
+            {
+                return new ResultModel<Category>
+                {
+                    Errors = new List<string> { $"There is no category with id :{entity.Id}" }
+                };
+            }
+            //does another category with same name exist?
+            if (await DoesCategoryNameExistsAsync(entity))
+            {
+                return new ResultModel<Category>
+                {
+                    Errors = new List<string> { $"There is already category with id :{entity.Id}" }
+                };
+            }
+            entity.LastEditedOn = DateTime.UtcNow;
+            _applicationDbContext.Categories.Update(entity);
+            await _applicationDbContext.SaveChangesAsync();
+            return new ResultModel<Category>
+            {
+                Data = entity
+            };
         }
     }
 }

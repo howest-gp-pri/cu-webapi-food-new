@@ -19,20 +19,22 @@ namespace Pri.WebApi.Food.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Search([FromQuery] string searchQuery)
         {
-            var searchResults = await _productService.SearchAsync(searchQuery);
-
-            var searchResultsDto = searchResults.Select(s => new ProductResponseDto
+            var searchResult = await _productService.SearchAsync(searchQuery);
+            if (searchResult.Success)
             {
-                Id = s.Id,
-                Name = s.Name,
-                Category = new CategoryResponseDto
+                var searchResultsDto = searchResult.Data.Select(s => new ProductResponseDto
                 {
-                    Id = s.Category.Id,
-                    Name = s.Category.Name
-                }
-            });
-
-            return Ok(searchResultsDto);
+                    Id = s.Id,
+                    Name = s.Name,
+                    Category = new CategoryResponseDto
+                    {
+                        Id = s.Category.Id,
+                        Name = s.Category.Name
+                    }
+                });
+                return Ok(searchResultsDto);
+            }
+            return BadRequest(searchResult.Success);
         }
     }
 }

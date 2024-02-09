@@ -2,7 +2,9 @@
 using Pri.WebApi.Food.Api.Dtos.Categories;
 using Pri.WebApi.Food.Api.Dtos.Products;
 using Pri.WebApi.Food.Core.Entities;
+using Pri.WebApi.Food.Core.Services;
 using Pri.WebApi.Food.Core.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace Pri.WebApi.Food.Api.Controllers
 {
@@ -10,133 +12,193 @@ namespace Pri.WebApi.Food.Api.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        protected readonly IProductService _productService;
+        private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
+        private readonly IImageService _imageService;
 
         public ProductsController(
             IProductService productService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IImageService imageService)
         {
             _productService = productService;
             _categoryService = categoryService;
+            _imageService = imageService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var products = await _productService.ListAllAsync();
-            var productsDto = products.Select(p => new ProductResponseDto
+            var result = await _productService.ListAllAsync();
+            if (result.Success)
             {
-                Id = p.Id,
-                Name = p.Name,
-                Category = new CategoryResponseDto
+                var productDtos = result.Data.Select(c => new ProductResponseDto
                 {
-                    Id = p.Category.Id,
-                    Name = p.Category.Name
-                }
-            });
-
-            return Ok(productsDto);
+                    Id = c.Id,
+                    Name = c.Name,
+                    Category = new CategoryResponseDto
+                    {
+                        Id = c.Category.Id,
+                        Name = c.Category.Name
+                    },
+                    Image = $"{Request.Scheme}://{Request.Host}/img/{c.Image}"
+                });
+                return Ok(productDtos);
+            }
+            return BadRequest(result.Errors);
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var product = await _productService.GetByIdAsync(id);
-
-            if (product == null)
+            if (await _categoryService.DoesCategoryIdExistsAsync(id) == false)
             {
-                return NotFound($"No product with an id of {id}");
+                return NotFound();
             }
-
-            var productDto = new ProductResponseDto
+            var result = await _productService.GetByIdAsync(id);
+            if (result.Success)
             {
-                Id = product.Id,
-                Name = product.Name,
-                Category = new CategoryResponseDto
+                var productDto = new ProductResponseDto
                 {
-                    Id = product.Category.Id,
-                    Name = product.Category.Name
-                }
-            };
-
-            return Ok(productDto);
+                    Id = result.Data.Id,
+                    Name = result.Data.Name,
+                    Category = new CategoryResponseDto
+                    {
+                        Id = result.Data.Category.Id,
+                        Name = result.Data.Category.Name
+                    },
+                    Image = $"{Request.Scheme}://{Request.Host}/img/{result.Data.Image}"
+                };
+                return Ok(productDto);
+            }
+            return BadRequest(result.Errors);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Add(ProductRequestDto productDto)
         {
-            // Check if CategoryId exists in db
-            var category = await _categoryService.GetByIdAsync(productDto.CategoryId);
-
-            if (category == null)
+            if (!await _categoryService.DoesCategoryIdExistsAsync(productDto.CategoryId))
             {
                 return BadRequest($"Cannot add new product because category with id {productDto.CategoryId} does not exists");
             }
-
             var product = new Product
             {
                 CategoryId = productDto.CategoryId,
-                Name = productDto.Name
+                Name = productDto.Name,
+                Image = "food/default.jpg"
             };
-
-            //In our db, it is allowed to have products with the same name
-            await _productService.AddAsync(product);
-
-            var dto = new ProductResponseDto
+            var resultProduct = await _productService.AddAsync(product);
+            if (resultProduct.Success)
             {
-                Id = product.Id,
-                Name = product.Name,
-                Category = new CategoryResponseDto
+                var resultCategory = await _categoryService.GetByIdAsync(product.CategoryId);
+                if (resultCategory.Success)
                 {
-                    Id = category.Id,
-                    Name = category.Name
+                    var dto = new ProductResponseDto
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        Category = new CategoryResponseDto
+                        {
+                            Id = resultCategory.Data.Id,
+                            Name = resultCategory.Data.Name
+                        },
+                        Image = $"{Request.Scheme}://{Request.Host}/img/{product.Image}"
+                    };
+                    return CreatedAtAction(nameof(Get), new { id = product.Id }, dto);
                 }
-            };
-
-            return CreatedAtAction(nameof(Get), new { id = product.Id }, dto);
+                return BadRequest(resultCategory.Errors);
+            }
+            return BadRequest(resultProduct.Errors);
         }
+
 
         [HttpPut]
         public async Task<IActionResult> Update(ProductRequestDto productDto)
         {
-            // Check if CategoryId exists in db
-            var category = await _categoryService.GetByIdAsync(productDto.CategoryId);
-
-            if (category == null)
+            if (await _productService.DoesProductIdExistAsync(productDto.Id) == false)
             {
-                return BadRequest($"Cannot update product because category with id {productDto.CategoryId} does not exists");
+                return BadRequest($"No product with id '{productDto.Id}' found");
             }
-
-            var existingProduct = await _productService.GetByIdAsync(productDto.Id);
-
-            if (existingProduct == null)
+            var existingProductResult = await _productService.GetByIdAsync(productDto.Id);
+            if (existingProductResult.Success == false)
             {
-                return BadRequest($"No product with an id of {productDto.Id}");
+                return BadRequest(existingProductResult.Errors);
             }
-
-            existingProduct.CategoryId = productDto.CategoryId;
-            existingProduct.Name = productDto.Name;
-
-            //In our db, it is allowed to have products with the same name
-            await _productService.UpdateAsync(existingProduct);
-
-            return Ok($"Product {existingProduct.Id} updated");
+            var existingEntity = existingProductResult.Data;
+            existingEntity.CategoryId = productDto.CategoryId;
+            existingEntity.Name = productDto.Name;
+            var result = await _productService.UpdateAsync(existingEntity);
+            if (result.Success)
+            {
+                return Ok($"Product {existingEntity.Id} updated");
+            }
+            return BadRequest(result.Errors);
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var product = await _productService.GetByIdAsync(id);
-
-            if (product == null)
+            if (await _productService.DoesProductIdExistAsync(id) == false)
             {
                 return NotFound($"No product with an id of {id}");
             }
+            var existingProductResult = await _productService.GetByIdAsync(id);
+            if (existingProductResult.Success == false)
+            {
+                return BadRequest(existingProductResult.Errors);
+            }
+            var result = await _productService.DeleteAsync(existingProductResult.Data);
+            return Ok($"Product {existingProductResult.Data.Id} deleted");
+        }
+        [HttpPost("WithImage")]
+        public async Task<IActionResult> AddWithImage([FromForm] ProductRequestWithImageDto productRequestWithImageDto)
+        {
+            if (!await _categoryService.DoesCategoryIdExistsAsync
+              (productRequestWithImageDto.CategoryId))
+            {
+                return BadRequest($"Cannot add new product because category with id {productRequestWithImageDto.CategoryId} does not exists");
+            }
+            var product = new Product
+            {
+                CategoryId = productRequestWithImageDto.CategoryId,
+                Name = productRequestWithImageDto.Name,
+                Image = "default.jpg",
+            };
 
-            await _productService.DeleteAsync(product);
-
-            return Ok($"Product {product.Id} deleted");
+            if (productRequestWithImageDto.Image != null)
+            {
+                var result = await
+                     _imageService.AddOrUpdateImageAsync(productRequestWithImageDto.Image);
+                if (result.Success)
+                {
+                    product.Image = result.Data;
+                }
+            }
+            var resultProduct = await _productService.AddAsync(product);
+            if (resultProduct.Success)
+            {
+                var resultCategory = await _categoryService.GetByIdAsync(product.CategoryId);
+                if (resultCategory.Success)
+                {
+                    var dto = new ProductResponseDto
+                    {
+                        Id = product.Id,
+                        Name = product.Name,
+                        Category = new CategoryResponseDto
+                        {
+                            Id = resultCategory.Data.Id,
+                            Name = resultCategory.Data.Name
+                        },
+                        Image = $"{Request.Scheme}://{Request.Host}/img/food/{product.Image}"
+                    };
+                    return CreatedAtAction(nameof(Get), new { id = product.Id }, dto);
+                }
+                return BadRequest(resultCategory.Errors);
+            }
+            return BadRequest(resultProduct.Errors);
         }
     }
 }

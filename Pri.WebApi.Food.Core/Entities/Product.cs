@@ -11,5 +11,6 @@ namespace Pri.WebApi.Food.Core.Entities
         public Guid CategoryId { get; set; }
 
         public Category Category { get; set; }
+        public string Image { get; set; }
     }
 }
